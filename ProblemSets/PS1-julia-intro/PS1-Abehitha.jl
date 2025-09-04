@@ -4,7 +4,7 @@
     Description: This script contains the solutions to Problem Set 1 
 =#
 
-using JLD, Random, LinearAlgebra, Statistics, CSV, DataFrames, FreqTables, Distributions
+using Test, JLD, Random, LinearAlgebra, Statistics, CSV, DataFrames, FreqTables, Distributions
 
 function q1()
     #===============================================================================
@@ -117,7 +117,7 @@ function q2(A, B, C)
         end
     end
 
-    AB = A .* B
+    AB2 = A .* B
 
     #=========================== Part 2: b ============================================#
     # find indices of C where value of C is between -5 and 5
@@ -190,6 +190,8 @@ function q3()
     df = DataFrame(CSV.File("nlsw88.csv"))
     @show df[1:5, :]
     @show typeof(df[:, :grade])
+    # saves as cleaned CSV file
+    CSV.write("nlsw88_cleaned.csv", df)
 
     #=========================== Part 3: b ============================================#
     # percentage never married
@@ -218,9 +220,71 @@ function q3()
 
     return nothing
 end
+#===================================================================================
+**********************     Part 4   *********************************************
+====================================================================================#
+#=========================== Part 4: b and c ============================================#
+"""
+matrixops(A,B)
+Performs the following operations on matrices A and B:
+1. Computes the element-wise product of A and B.
+2. Computes the matrix product of the transpose of A and B.
+3. Computes the sum of all elements of the sum of A and B.
+"""
+    #=========================== Part 4: e ============================================#
+
+function matrixops(A::Array{Float64},B::Array{Float64})
+    #part (e) of question 4: check dimension compatibility
+    if size(A) != size(B)
+        error("Matrices A and B must have the same dimensions for element-wise operations.")
+    end
+    #(i) element-wise product of A and B
+    out1 = A .* B
+    #(ii) matrix product of A' and B
+    out2 = A' * B
+    #(iii) sum of all elements of A + B
+    out3 = sum(A+B)
+    return out1, out2, out3
+end
+
+function q4()
+    #=========================== Part 4: a ============================================#
+    #three ways to load the file
+    #load("matrixpractice.jld"),"A",A,"B",B,"C",C,"D",D,"E",E,"F",F,"G",G
+    #@load "matrixpractice.jld"
+    @load "matrixpractice.jld" A B C D E F G
+
+
+    #=========================== Part 4: d ============================================#
+    matrixops(A,B)
+
+    #=========================== Part 4: f ============================================#
+    try matrixops(C,D)
+        catch e
+            println("Trying matrixops(C,D):")
+            println(e)
+    end
+
+    #=========================== Part 4: g ============================================#
+    # read in processed CSV file
+    nlsw88 = DataFrame(CSV.File("nlsw88_cleaned.csv"))
+    ttl_exp = convert(Array, nlsw88.ttl_exp)
+    wage = convert(Array, nlsw88.wage)
+    matrixops(ttl_exp, wage)
+    
+
+    return nothing
+end
 
 #call the function from q1
 A, B, C, D = q1()
 
 #call the function from q2
 q2(A, B, C)
+
+#call the function from q3
+q3()
+
+#call the function from q4
+q4()
+
