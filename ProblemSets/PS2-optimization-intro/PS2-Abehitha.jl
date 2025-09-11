@@ -62,3 +62,16 @@ bols_lm = lm(@formula(married ~ age + white + collgrad), df)
 #===============================================================================
 *************************     Question 3   *************************************
 ===============================================================================#
+function logit(alpha, X, y)
+    loglike=sum(y.*(X*alpha)-log.(1 .+exp.(X*alpha)))
+    return -loglike
+end
+
+beta = optimize(alpha -> logit(alpha, X, y), rand(size(X,2)), LBFGS(), Optim.Options(g_tol=1e-6, iterations=100_000, show_trace=true))
+println(beta.minimizer)
+
+#===============================================================================
+*************************     Question 4   *************************************
+===============================================================================#
+
+beta_glm=glm(@formula(married ~ age + white + collgrad),df, Binomial(),LogitLink())
